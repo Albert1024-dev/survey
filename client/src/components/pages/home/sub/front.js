@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Survey from 'survey-react-ui';
 import 'survey-core/modern.min.css';
 import axios from 'axios';
-import questionList from './questions'; // Import the question list
+// import questionList from './questions'; // Import the question list
 import ethnicityData from '../../../../config/ethnicity'; // Assuming this file contains ethnicity options
 import {
     Container,
@@ -10,7 +10,7 @@ import {
     MenuItem,
     Button,
     Typography,
-    Snackbar,
+    // Snackbar,
     Alert,
 } from '@mui/material';
 
@@ -19,6 +19,15 @@ import { useNavigate } from 'react-router-dom';
 import config from '../../../../config/config';
 
 const SurveyComponent = () => {
+    const [questionList, setQuestionList] = useState([]);
+    useEffect(() => {
+        axios
+            .get(config.serverURL + '/api/question')
+            .then(result => {
+                setQuestionList(result.data.data);
+            });
+    }, []);
+
     const [isCompleted, setIsCompleted] = useState(false);
     const [userInfo, setUserInfo] = useState({
         fullName: '',
@@ -124,7 +133,7 @@ const SurveyComponent = () => {
                 }
                 
                 svStringViewer[i].getElementsByClassName('sv-string-viewer')[0].style.display = 'none';
-                if (svStringViewer[i].getElementsByTagName('ul').length == 0)
+                if (svStringViewer[i].getElementsByTagName('ul').length === 0)
                     svStringViewer[i].append(ul);
             }
         }

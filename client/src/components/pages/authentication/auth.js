@@ -22,7 +22,7 @@ function AuthPage() {
         const token = localStorage.getItem('authToken');
         if (token) {
             setIsLoggedIn(true);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            axios.defaults.headers.common['Authorization'] = `TalkType_Taku_Kapil ${token}`;
         }
     }, []);
 
@@ -44,32 +44,34 @@ function AuthPage() {
         }
 
         if (authMode === 'login') {
-        console.log("Logging in with", { email, password });
-        try {
-            const response = await axios.post(config.serverURL + '/api/auth/login', { email, password });
-            const result = response.data;
-            toast(result.message, { type: result.type });
-            
-            if (result.type) {
-                localStorage.setItem('authToken', result.token);
-                axios.defaults.headers.common['Authorization'] = `Bearer ${result.token}`;
-                setIsLoggedIn(true);  // Update login status
-                localStorage.setItem('isLoggedIn', true);
-                navigate('/');
+            try {
+                const response = await axios.post(config.serverURL + '/api/auth/login', { email, password });
+                const result = response.data;
+                toast(result.message, { type: result.type });
+                
+                if (result.type) {
+                    localStorage.setItem('authToken', JSON.stringify(result.token));
+                    axios.defaults.headers.common['Authorization'] = JSON.stringify(result.token);
+                    setIsLoggedIn(true);  // Update login status
+                    console.log(axios.defaults.headers.common['Authorization']);
+                    localStorage.setItem('isLoggedIn', true);
+                    navigate('/');
+                }
+            } catch (err) {
+                console.error(err);
+                toast('Error', { type: 'error' });
             }
-        } catch (err) {
-            console.error(err);
-            toast('Error', { type: 'error' });
-        }
         } else {
-        console.log("Registering with", { email, password });
-        try {
-            const response = await axios.post(config.serverURL + '/api/auth/register', { email, password });
-            const result = response.data;
-            toast(result.message, { type: result.type });
-        } catch (err) {
-            toast('Error', { type: 'error' });
-        }
+            try {
+                axios
+                    .post(config.serverURL + '/api/auth/register', { email, password, confirmPassword })
+                    .then(response => {
+                        const result = response.data;
+                        toast(result.message, { type: result.type });
+                    });
+            } catch (err) {
+                toast('Error', { type: 'error' });
+            }
         }
     };
 

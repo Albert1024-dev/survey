@@ -2,6 +2,7 @@ const Survey = require('../models/Survey');
 const User = require('../models/User');
 const fetch = require('node-fetch');
 const axios = require('axios');
+const Question = require('../models/Question');
 
 exports.create = async (req, res) => {
     var reqData = req.body;
@@ -43,8 +44,10 @@ exports.update = async (req, res) => {
         "B": 0,
         "C": 0
     };
+
+    const questions = await Question.find();
     
-    for (let i = 1; i <= 7; i++) { // Adjust according to your number of questions
+    for (let i = 1; i <= questions.length; i++) { // Adjust according to your number of questions
         const firstChoice = surveyData[`question${i}`];
         const secondChoice = surveyData[`question${i}_second`];
 
@@ -91,10 +94,16 @@ exports.update = async (req, res) => {
 }
 
 // GET route to fetch all survey entries with populated user information
-exports.get = async (req, res) => {
+exports.get = (req, res) => {
     try {
-        const surveys = await Survey.find().populate('userId', 'email firstName lastName'); // Populates userId with specific fields
-        res.status(200).json(surveys);
+        Survey
+            .find()
+            .then(result => {
+                return res.json(result);
+            })
+            .catch(err => {
+                return res.json([]);
+            });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
