@@ -28,7 +28,7 @@ const SurveySchema = new Schema({
         type: Object,
     },
     totalResult: {
-        type: String,
+        type: Object,
     },
     created_at: {
         type: Date,

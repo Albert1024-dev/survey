@@ -63,9 +63,9 @@ exports.update = async (req, res) => {
     }
 
     const percentages = {
-        "A": ((scores["A"] / totalScore) * 100) || 0,
-        "B": ((scores["B"] / totalScore) * 100) || 0,
-        "C": ((scores["C"] / totalScore) * 100) || 0,
+        "A": (Math.round(scores["A"] / totalScore * 10000) / 100) || 0,
+        "B": (Math.round(scores["B"] / totalScore * 10000) / 100) || 0,
+        "C": (Math.round(scores["C"] / totalScore * 10000) / 100) || 0,
     };
 
     // Convert percentages object to an array of [key, value] pairs
@@ -75,21 +75,21 @@ exports.update = async (req, res) => {
     entries.sort(([, valueA], [, valueB]) => valueB - valueA);
 
     // Get the keys of the two highest values
-    const topTwoKeys = entries.slice(0, 2).map(([key]) => key);
+    const topKeys = entries.map(([key]) => key);
 
     // Sum the keys (assuming they are numeric)
-    const sumOfTopTwoKeys = topTwoKeys.join('');
+    const sumKeys = topKeys.join('');
 
     survey.talkingResult = req.body.talkingResult;
-    survey.totalResult = sumOfTopTwoKeys;
+    survey.totalResult = entries;
 
     survey.save()
         .then(() => {
-            res.status(200).json({ status: true, message: "Survey updated successfully", talkType: sumOfTopTwoKeys });
+            res.status(200).json({ status: true, message: "Survey updated successfully", talkType: entries });
         })
         .catch(err => {
             console.log(err);
-            res.status(500).json({ status: false, message: 'An error occurred during processing', talkType: '' });
+            res.status(500).json({ status: false, message: 'An error occurred during processing', talkType: [] });
         });
 }
 
@@ -136,53 +136,3 @@ async function getLocationFromIP(ipAddress) {
         return null;
     }
 };
-
-function getRoundedPercentage(AP, BP, CP) {
-    let total = AP + BP + CP;
-    if (total === 0) return { AP: 0, BP: 0, CP: 0 }; // Handle division by zero
-    let rawAP = (AP / total) * 100;
-    let rawBP = (BP / total) * 100;
-    let rawCP = (CP / total) * 100;
-
-    // Round down each percentage
-    let roundedAP = Math.floor(rawAP);
-    let roundedBP = Math.floor(rawBP);
-    let roundedCP = Math.floor(rawCP);
-    let roundedTotal = roundedAP + roundedBP + roundedCP;
-
-    // Adjust percentages to ensure they sum to 100%
-    let difference = 100 - roundedTotal;
-    let roundedPercentages = { AP: roundedAP, BP: roundedBP, CP: roundedCP };
-
-    if (difference > 0) {
-        let remainders = [
-            { value: rawAP - roundedAP, name: 'AP' },
-            { value: rawBP - roundedBP, name: 'BP' },
-            { value: rawCP - roundedCP, name: 'CP' },
-        ];
-        remainders.sort((a, b) => b.value - a.value);
-        for (let i = 0; i < difference; i++) {
-            roundedPercentages[remainders[i % 3].name]++;
-        }
-    }
-    return roundedPercentages;
-};
-
-function getTop2Scores(roundedPercentages) {
-    const scores = [
-        { name: 'A', value: roundedPercentages.AP },
-        { name: 'B', value: roundedPercentages.BP },
-        { name: 'C', value: roundedPercentages.CP }
-    ];
-
-    // Sort the scores in descending order
-    scores.sort((a, b) => b.value - a.value);
-
-    // Get the top 2 scores
-    const top2 = scores.slice(0, 2);
-
-    // Combine the names of the top 2 scores
-    // const combination = top2.map(score => score.name).join('');
-
-    return top2[0].name + top2[1].name;
-}

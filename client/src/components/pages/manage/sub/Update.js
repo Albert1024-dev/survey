@@ -163,41 +163,53 @@ export default function Update(props) {
     };
 
     const onUpdate = () => {
-        console.log(id);
-        var first = [], second = [], third = [];
-        for (let i = 0; i < subquestionsFirst.length; i++) {
-            first.push(subquestionsFirst[i].text);
-        }
-        for (let i = 0; i < subquestionsSecond.length; i++) {
-            second.push(subquestionsSecond[i].text);
-        }
-        for (let i = 0; i < subquestionsThird.length; i++) {
-            third.push(subquestionsThird[i].text);
-        }
-
-        const sendData = {
-            title: title,
-            choices: [
-                { value: 'A', text: first },
-                { value: 'B', text: second },
-                { value: 'C', text: third }
-            ]
-        };
-
-        console.log(sendData);
-        axios
-            .post(`${config.serverURL}/api/question/${id}`, sendData)
-            .then(response => {
-                const data = response.data;
-                toast(data.message, { type: data.type });
-                if (data.status) {
-                    setSubquestionsFirst([{ id: Date.now(), text: '' }]);
-                    setSubquestionsSecond([{ id: Date.now(), text: '' }]);
-                    setSubquestionsThird([{ id: Date.now(), text: '' }]);
-                    setTitle('');
-                    navigate(-1);
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, update it!"
+        }).then((result) => {
+                
+            if (result.isConfirmed) {
+                var first = [], second = [], third = [];
+                for (let i = 0; i < subquestionsFirst.length; i++) {
+                    first.push(subquestionsFirst[i].text);
                 }
-        })
+                for (let i = 0; i < subquestionsSecond.length; i++) {
+                    second.push(subquestionsSecond[i].text);
+                }
+                for (let i = 0; i < subquestionsThird.length; i++) {
+                    third.push(subquestionsThird[i].text);
+                }
+
+                const sendData = {
+                    title: title,
+                    choices: [
+                        { value: 'A', text: first },
+                        { value: 'B', text: second },
+                        { value: 'C', text: third }
+                    ]
+                };
+
+                console.log(sendData);
+                axios
+                    .post(`${config.serverURL}/api/question/${id}`, sendData)
+                    .then(response => {
+                        const data = response.data;
+                        toast(data.message, { type: data.type });
+                        if (data.status) {
+                            setSubquestionsFirst([{ id: Date.now(), text: '' }]);
+                            setSubquestionsSecond([{ id: Date.now(), text: '' }]);
+                            setSubquestionsThird([{ id: Date.now(), text: '' }]);
+                            setTitle('');
+                            navigate(-1);
+                        }
+                    });
+            }
+        });
     }
 
     const onCancel = () => {

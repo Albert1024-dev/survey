@@ -18,6 +18,8 @@ import { useNavigate } from 'react-router-dom';
 
 import config from '../../../../config/config';
 
+import PieArcLabel from './overview';
+
 const SurveyComponent = () => {
     const [questionList, setQuestionList] = useState([]);
     useEffect(() => {
@@ -37,7 +39,8 @@ const SurveyComponent = () => {
     });
     const [userId, setUserId] = useState(null);
     const [error, setError] = useState('');
-    const [talkType, setTalkType] = useState('');
+    const [talkType, setTalkType] = useState([]);
+    const [talkTypeText, setTalkTypeText] = useState('');
 
     // Handle input change for user info
     const handleChange = (e) => {
@@ -167,6 +170,8 @@ const SurveyComponent = () => {
                 talkingResult: surveyData
             });
             setTalkType(response.data.talkType);
+            const tempArray = response.data.talkType.map(([key]) => key);
+            setTalkTypeText(tempArray.join(''));
             setIsCompleted(true);
             setTimeout(() => navigate('/'), 5000);
         } catch (error) {
@@ -193,73 +198,74 @@ const SurveyComponent = () => {
                             <br />
                             Your Talk Type is
                             < br />
-                            <div style={{ 'fontSize': '20px'}}>{talkType}</div>
+                            <div style={{ 'fontSize': '20px'}}>{talkTypeText}</div>
+                            <PieArcLabel data={talkType} />
                         </Typography>
                     ) : (
                         <Survey.Survey model={surveyModel} />
                     )}
                 </div>
             ) : (
-                <div>
-                    <Typography variant="h5" align="center">User Information</Typography>
-                    <form onSubmit={handleUserInfoSubmit}>
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Full Name"
-                            name="fullName"
-                            value={userInfo.fullName}
-                            onChange={handleChange}
-                            required
-                        />
-                        <TextField
-                            select
-                            fullWidth
-                            margin="normal"
-                            label="Gender"
-                            name="gender"
-                            value={userInfo.gender}
-                            onChange={handleChange}
-                            required
-                        >
-                            <MenuItem value=""><em>Select...</em></MenuItem>
-                            <MenuItem value="male">Male</MenuItem>
-                            <MenuItem value="female">Female</MenuItem>
-                            <MenuItem value="other">Other</MenuItem>
-                        </TextField>
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="Birthday"
-                            type="date"
-                            name="birthday"
-                            value={userInfo.birthday}
-                            onChange={handleChange}
-                            InputLabelProps={{ shrink: true }}
-                            required
-                        />
-                        <TextField
-                            select
-                            fullWidth
-                            margin="normal"
-                            label="Ethnicity"
-                            name="ethnicity"
-                            value={userInfo.ethnicity}
-                            onChange={handleChange}
-                            required
-                        >
-                            <MenuItem value=""><em>Select...</em></MenuItem>
-                            {ethnicityData.map(ethnicity => (
-                                <MenuItem key={ethnicity.value} value={ethnicity.value}>
-                                    {ethnicity.text}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <Button variant="contained" color="primary" type="submit" fullWidth>Next</Button>
-                        <Button variant="contained" color="orange" type="button" onClick={() => goBack()} style={{ 'margin-top': '10px' }} fullWidth>Back</Button>
-                        {error && <Alert severity="error">{error}</Alert>}
-                    </form>
-                </div>
+                    <div>
+                        <Typography variant="h5" align="center">User Information</Typography>
+                        <form onSubmit={handleUserInfoSubmit}>
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Full Name"
+                                name="fullName"
+                                value={userInfo.fullName}
+                                onChange={handleChange}
+                                required
+                            />
+                            <TextField
+                                select
+                                fullWidth
+                                margin="normal"
+                                label="Gender"
+                                name="gender"
+                                value={userInfo.gender}
+                                onChange={handleChange}
+                                required
+                            >
+                                <MenuItem value=""><em>Select...</em></MenuItem>
+                                <MenuItem value="male">Male</MenuItem>
+                                <MenuItem value="female">Female</MenuItem>
+                                <MenuItem value="other">Other</MenuItem>
+                            </TextField>
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Birthday"
+                                type="date"
+                                name="birthday"
+                                value={userInfo.birthday}
+                                onChange={handleChange}
+                                InputLabelProps={{ shrink: true }}
+                                required
+                            />
+                            <TextField
+                                select
+                                fullWidth
+                                margin="normal"
+                                label="Ethnicity"
+                                name="ethnicity"
+                                value={userInfo.ethnicity}
+                                onChange={handleChange}
+                                required
+                            >
+                                <MenuItem value=""><em>Select...</em></MenuItem>
+                                {ethnicityData.map(ethnicity => (
+                                    <MenuItem key={ethnicity.value} value={ethnicity.value}>
+                                        {ethnicity.text}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                            <Button variant="contained" color="primary" type="submit" fullWidth>Next</Button>
+                            <Button variant="contained" color="orange" type="button" onClick={() => goBack()} style={{ 'margin-top': '10px' }} fullWidth>Back</Button>
+                            {error && <Alert severity="error">{error}</Alert>}
+                        </form>
+                    </div>
             )}
         </Container>
     );
