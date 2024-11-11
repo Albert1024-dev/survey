@@ -138,7 +138,7 @@ export default function ViewResult() {
                                                 return (
                                                     <TableCell key={column.id} align={column.align}>
                                                         {
-                                                            value.map(item => {
+                                                            typeof value === 'object' && value.map(item => {
                                                                 return (
                                                                     <div key={item} style={{ display: 'flex' }}>
                                                                         <div style={{ width: '20px', marginLeft: 'auto' }}>{item[0]}: </div><div style={{ width: '80px'}}>{item[1]} %</div>

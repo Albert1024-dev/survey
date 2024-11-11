@@ -6,6 +6,7 @@ const path = require('path');
 const app = express();
 
 const Router = require('./routes/api');
+const adminRouter = require('./routes/admin');
 const connectDB = require('./config/database');
 const { connect } = require('http2');
 
@@ -20,6 +21,7 @@ app.set('trust proxy', true);
 
 // Use Router
 app.use('/api', Router);
+app.use('/admin', adminRouter);
 
 // Define Static folder
 app.use(express.static(path.join(__dirname, 'public')));

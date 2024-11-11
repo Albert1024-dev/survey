@@ -14,13 +14,41 @@ import {
     Alert,
 } from '@mui/material';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import config from '../../../../config/config';
 
 import PieArcLabel from './overview';
 
 const SurveyComponent = () => {
+    const location = useLocation();
+    const [userId, setUserId] = useState(null);
+    const [error, setError] = useState('');
+    const [talkType, setTalkType] = useState([]);
+    const [talkTypeText, setTalkTypeText] = useState('');
+
+    const [isCompleted, setIsCompleted] = useState(false);
+
+    // useEffect(() => {
+    //     const handleBeforeUnload = (event) => {
+    //         console.log(userId, isCompleted);
+    //     // Send your request here
+    //         if (userId && !isCompleted)
+    //             axios
+    //                 .post(config.serverURL + '/api/surveys/delete/' + userId);
+            
+    //         // Add a message to prompt the user (optional)
+    //         event.preventDefault();
+    //         event.returnValue = ""; // Some browsers require this line for prompts
+    //     };
+
+    //     window.addEventListener("beforeunload", handleBeforeUnload);
+
+    //     return () => {
+    //         window.removeEventListener("beforeunload", handleBeforeUnload);
+    //     };
+    // }, []);
+
     const [questionList, setQuestionList] = useState([]);
     useEffect(() => {
         axios
@@ -29,18 +57,12 @@ const SurveyComponent = () => {
                 setQuestionList(result.data.data);
             });
     }, []);
-
-    const [isCompleted, setIsCompleted] = useState(false);
     const [userInfo, setUserInfo] = useState({
         fullName: '',
         gender: '',
         birthday: '',
         ethnicity: ''
     });
-    const [userId, setUserId] = useState(null);
-    const [error, setError] = useState('');
-    const [talkType, setTalkType] = useState([]);
-    const [talkTypeText, setTalkTypeText] = useState('');
 
     // Handle input change for user info
     const handleChange = (e) => {
@@ -262,7 +284,7 @@ const SurveyComponent = () => {
                                 ))}
                             </TextField>
                             <Button variant="contained" color="primary" type="submit" fullWidth>Next</Button>
-                            <Button variant="contained" color="orange" type="button" onClick={() => goBack()} style={{ 'margin-top': '10px' }} fullWidth>Back</Button>
+                            <Button variant="contained" color="orange" type="button" onClick={() => goBack()} style={{ 'marginTop': '10px' }} fullWidth>Back</Button>
                             {error && <Alert severity="error">{error}</Alert>}
                         </form>
                     </div>
